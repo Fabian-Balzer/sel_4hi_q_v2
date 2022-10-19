@@ -132,8 +132,8 @@ def _process_single_vhs_column(table: Table, band: Band) -> Table:
     to AB system and add a column with the corresponding flux (and errors) in ergs/(cm**2*Hz*s)"""
     ab_corr = VEGA_AB_DICT[band]
     # Correct the magnitude for dust and convert it from vega to ab:
-    table[f"c_mag_{band}"] = table[f"mag{band}"] + \
-        table[f"a_{band}"] + ab_corr
+    table[f"c_mag_{band}"] = table[f"mag_{band}"] + \
+        table[f"a{band}"] + ab_corr
     table[f"c_mag_err_{band}"] = table[f"mag_{band}err"] + \
         table[f"a{band}"] + ab_corr
     # Convert the magnitude to flux:
