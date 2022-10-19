@@ -1,5 +1,5 @@
 """Define some useful types for this module"""
-from typing import Literal
+from typing import Literal, Union
 
 from astropy.table import Table
 
@@ -20,3 +20,6 @@ Brickstring = str
 # To make it easier to distinguish the tow table types
 TablePointlike = Table
 TableExtended = Table
+
+
+TableSplit = Union[TablePointlike, TableExtended]

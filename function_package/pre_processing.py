@@ -5,9 +5,10 @@ from typing import Sequence
 import numpy as np
 from astropy.table import Table
 
-from .custom_constants import (ALL_GALEX_BANDS, ALL_SWEEP_BANDS, ALL_VHS_BANDS,
-                               VEGA_AB_DICT)
-from .custom_types import Band, TableExtended, TablePointlike, TableType
+from .custom_constants import (ALL_BANDS, ALL_GALEX_BANDS, ALL_SWEEP_BANDS,
+                               ALL_VHS_BANDS, VEGA_AB_DICT)
+from .custom_types import (Band, TableExtended, TablePointlike, TableSplit,
+                           TableType)
 
 
 def _process_single_sweep_column(table: Table, band: Band) -> Table:
@@ -22,7 +23,7 @@ def _process_single_sweep_column(table: Table, band: Band) -> Table:
     return table
 
 
-def process_sweep_columns(table: Table, bands: Sequence[str] = ALL_SWEEP_BANDS) -> Table:
+def process_sweep_columns(table: Table, bands: Sequence[Band] = ALL_SWEEP_BANDS) -> Table:
     """Correct the sweep columns (assumed to be of the form `flux_{band}` and `flux_ivar_{band}`)
     for the transmission values that are provided in the `mw_transmission_{band}` column.
 
@@ -58,7 +59,7 @@ def _process_single_galex_column(table: Table, band: Band) -> Table:
     return table
 
 
-def process_galex_columns(table: Table, bands: Sequence[str] = ALL_GALEX_BANDS) -> Table:
+def process_galex_columns(table: Table, bands: Sequence[Band] = ALL_GALEX_BANDS) -> Table:
     """Correct the galex columns (assumed to be of the form `flux_{band}` and `flux_err_{band}`)
     for the EBV values that are provided in the `galex_ebv` column.
 
@@ -66,7 +67,7 @@ def process_galex_columns(table: Table, bands: Sequence[str] = ALL_GALEX_BANDS) 
     ----------
     table : Table
         The input table with the uncorrected fluxes
-    bands : Sequence[str], optional
+    bands : Sequence[Band], optional
         The bands to convert, by default ALL_GALEX_BANDS
 
     Returns
@@ -127,7 +128,7 @@ def split_table_by_sourcetype(table: Table) -> tuple[TablePointlike, TableExtend
     return pointlike, extended
 
 
-def _process_single_vhs_column(table: Table, band: Band) -> Table:
+def _process_single_vhs_column(table: TableSplit, band: Band) -> Table:
     """Coming from a column with name magcolname, convert its values from the vega
     to AB system and add a column with the corresponding flux (and errors) in ergs/(cm**2*Hz*s)"""
     ab_corr = VEGA_AB_DICT[band]
@@ -138,12 +139,12 @@ def _process_single_vhs_column(table: Table, band: Band) -> Table:
         table[f"a{band}"] + ab_corr
     # Convert the magnitude to flux:
     table[f"c_flux_{band}"] = 10**(-(table[f"c_mag_{band}"] + 48.6) / 2.5)
-    table[f"c_flux_{band}"] = 10**(-(table[f"c_mag_{band}"] + 48.6) / 2.5) * \
+    table[f"c_flux_err_{band}"] = 10**(-(table[f"c_mag_{band}"] + 48.6) / 2.5) * \
         table[f"c_mag_err_{band}"] * np.log(10) / 2.5
     return table
 
 
-def process_vhs_columns(table: Table, bands: Sequence[str] = ALL_VHS_BANDS) -> Table:
+def process_vhs_columns(table: TableSplit, bands: Sequence[str] = ALL_VHS_BANDS) -> Table:
     """Convert the vhs columns (assumed to be of the form `mag_{band}` and `mag_{band}err`)
     from their VEGA magnitudes to flux columns
 
@@ -161,4 +162,28 @@ def process_vhs_columns(table: Table, bands: Sequence[str] = ALL_VHS_BANDS) -> T
     """
     for band in bands:
         table = _process_single_vhs_column(table, band)
+    return table
+
+
+def process_for_lephare(table: TableSplit, bands: Sequence[Band] = ALL_BANDS) -> TableSplit:
+    """Returns a table only containing SWEEP ra and dec and then, in
+    alternating fashion, flux and flux error for each of the requested bands
+    (in the order given by BAND_LIST), followed by the ZSPEC column.
+    """
+    col_list = ["sweep_id"]
+    new_colnames = ["IDENT"]
+    for band in bands:
+        col_list.append("c_flux_" + band)
+        col_list.append("c_flux_err_" + band)
+        new_colnames.append(band)
+        new_colnames.append(band + "_err")
+    for infocol in ["CONTEXT", "zspec", "String"]:
+        col_list.append(infocol)
+        new_colnames.append(infocol)
+    table["CONTEXT"] = "-1"
+    table["String"] = ""
+    table = table[col_list]
+    table.rename_columns(col_list, new_colnames)
+    # Replace any null values with -99. as they otherwise cause problems for LePhare:
+    # for colname in new_colnames:
     return table
