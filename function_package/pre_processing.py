@@ -80,7 +80,7 @@ def process_galex_columns(table: Table, bands: Sequence[Band] = ALL_GALEX_BANDS)
     return table
 
 
-def _delete_all_apermag_cols(table: Table, ttype: TableType) -> Table:
+def _delete_all_apermag_cols(table: TableSplit, ttype: TableType) -> Table:
     """Delete all column names containing `apermag{suffix}` from the given table.
     Suffix should be "4" or "6".
     """
@@ -184,6 +184,14 @@ def process_for_lephare(table: TableSplit, bands: Sequence[Band] = ALL_BANDS) ->
     table["String"] = ""
     table = table[col_list]
     table.rename_columns(col_list, new_colnames)
+    for col in new_colnames:
+        if col not in ["IDENT", "CONTEXT", "STRING"]:
+            # We need to try/except since astropy doesn't like filling columns that
+            # do not have any nan values
+            try:
+                table[col] = table[col].filled(-99.)
+            except AttributeError:
+                pass
     # Replace any null values with -99. as they otherwise cause problems for LePhare:
     # for colname in new_colnames:
     return table
