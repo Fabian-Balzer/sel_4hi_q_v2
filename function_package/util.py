@@ -1,6 +1,10 @@
 """Utility functions for smoothing things out"""
-from astropy.table import Table
+import os
+
 import numpy as np
+from astropy.table import Table
+
+from .custom_paths import ALL_PATHS
 
 
 def rename_columns_to_lowercase(table: Table) -> Table:
@@ -39,3 +43,12 @@ def convert_rad_to_deg(table: Table) -> Table:
         table[col] = table[col] * 180 / np.pi
         table[col].info.unit = "deg"
     return table
+
+
+def generate_all_filepaths():
+    """Generate the paths that are expected for the application to run.
+    WARNING: This might create lots of paths relative to your current working
+    directory, so make sure you know what you're doing!
+    """
+    for path in ALL_PATHS:
+        os.makedirs(path, exist_ok=True)
