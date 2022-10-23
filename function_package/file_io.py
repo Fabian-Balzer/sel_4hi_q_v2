@@ -1,31 +1,64 @@
 """Functions concerning reading and writing files"""
 import logging
 import warnings
+from typing import Optional
 
+from astropy.table import Table
 from astropy.units import UnitsWarning
 
-from .custom_paths import LEPHARE_IN_PATH
+from .custom_paths import get_filepath
 from .custom_types import Filestem, TableSplit, TableType
 
 
-def write_lephare_input(table: TableSplit, ttype: TableType, filestem: Filestem = "base",
-                        overwrite: bool = False):
-    """Write the lephare input table to the input directory
+def write_table_as_backup(table: Table, path_type: str, ttype: Optional[TableType] = None,
+                          stem: str = "base", overwrite: bool = False):
+    """Writes the given table as a backup to the corresponding path
 
     Parameters
     ----------
-    table : TableSplit
-        The table to write. Needs to be in the right format!
-    ttype : TableType
-        extended or pointlike
-    filestem : Filestem, optional
-        The stem used for this run, by default "base"
+    table : Table
+        The table to save on disk
+    path_type : str
+        The path_type describing the type of table and therefore the filepath
+    ttype : Optional[TableType], optional
+        In case it's needed, specify whether the table is extended or pointlike, by default None
+    stem : str, optional
+        The stem to describe the run by, by default "base"
+    overwrite : bool, optional
+        Whether to directly overwrite an existing backup table of that name, by default False
     """
-    fname = f"{filestem}_input_{ttype}"
-    fpath = LEPHARE_IN_PATH + fname
+    fpath = get_filepath(path_type, ttype, stem)
+    file_format = fpath.split(".")[-1]
+    file_format = "ascii" if file_format in ["in", "out"] else file_format
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UnitsWarning)
-        table.write(fpath + ".fits", overwrite=overwrite)
-        table.write(fpath + ".in", format="ascii", overwrite=overwrite)
+        table.write(fpath, format=file_format, overwrite=overwrite)
     logging.info(
-        "Successfully written a LePhare input file at %s as a .fits and as a .in", fpath)
+        "Successfully written a %s file at %s.", path_type, fpath)
+
+
+def read_table_from_backup(path_type: str, ttype: Optional[TableType] = None,
+                           stem: str = "base") -> Table:
+    """Read a table from backup, expecting it to be found at the corresponding path.
+
+    Parameters
+    ----------
+    path_type : str
+        The path_type describing the type of table and therefore the filepath
+    ttype : Optional[TableType], optional
+        In case it's needed, specify whether the table is extended or pointlike, by default None
+    stem : str, optional
+        The stem to describe the run by, by default "base"
+
+    Returns
+    -------
+    Table
+        The table found at the path.
+    """
+    fpath = get_filepath(path_type, ttype, stem)
+    file_format = fpath.split(".")[-1]
+    file_format = "ascii" if file_format in ["in", "out"] else file_format
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UnitsWarning)
+        table = Table.read(fpath, format=file_format)
+    return table

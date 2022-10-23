@@ -158,3 +158,25 @@ def load_and_clean_sweep(region: Region, dpath: Dirpath = CATPATH,
         relevant_cols += [prefix + band for band in bands]
     table = table[relevant_cols]
     return table
+
+
+def clean_galex_matched_table(matched_table: Table) -> Table:
+    """Manipulate the column names of a matched galex table.
+
+    Parameters
+    ----------
+    matched_table : Table
+        The galex table
+
+    Returns
+    -------
+    Table
+        The galex table, reduced to the relevant column names.
+    """
+    relevant_cols = ["angDist", "RAJ2000", "DEJ2000", "sweep_id",
+                     "E(B-V)", "Fflux", "Nflux", "e_Fflux", "e_Nflux"]
+    new_colnames = ["sep_to_galex", "ra_galex", "dec_galex", "sweep_id"
+                    "galex_ebv", "flux_fuv", "flux_nuv", "flux_err_fuv", "flux_err_nuv"]
+    matched_table.keep_columns(relevant_cols)
+    matched_table.rename_columns(relevant_cols, new_colnames)
+    return matched_table
