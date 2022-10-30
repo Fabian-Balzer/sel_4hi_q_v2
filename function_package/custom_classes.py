@@ -1,8 +1,11 @@
 """Some custom classes that might be necessary"""
+import json
 from math import ceil, floor
+from typing import Optional
 
 from astropy.table import Table
 
+from .custom_paths import get_filepath
 from .custom_types import Brickstring, Regionstring
 
 
@@ -11,20 +14,30 @@ class Region:
     Also offers possibilities to provide the correct sweep tables.
     """
 
-    def __init__(self, ra_min: float, ra_max: float, dec_min: float, dec_max: float):
+    def __init__(self, ra_min: Optional[float] = None, ra_max: Optional[float] = None,
+                 dec_min: Optional[float] = None, dec_max: Optional[float] = None,
+                 stem: str = "",
+                 load_from_disk=False):
         """Initialise a rectangular region with the specified dimensions.
 
         Parameters
         ----------
-        ra_min : float
+        ra_min : Optional[float]
             The minimum ra in deg
-        ra_max : float
+        ra_max : Optional[float]
             The maximum ra in deg
-        dec_min : float
+        dec_min : Optional[float]
             The minimum dec in deg
-        dec_max : float
+        dec_max : Optional[float]
             The maximum dec in deg
         """
+        self.stem = stem
+        if load_from_disk:
+            fpath = get_filepath("region_backup", stem=stem)
+            with open(fpath, "r", encoding="utf-8") as f:
+                param_dict = json.loads(f.read())
+            ra_min, ra_max = param_dict["ra_min"], param_dict["ra_max"]
+            dec_min, dec_max = param_dict["dec_min"], param_dict["dec_max"]
         assert ra_max > ra_min, "The maximum ra has to be higher than the minimum ra"
         assert dec_max > dec_min, "The maximum dec has to be higher than the minimum dec"
         self.ra_min = ra_min
@@ -91,3 +104,13 @@ class Region:
                 reg_max = self._get_sweep_region_string(ra + 10, dec + 5)
                 brick_strings.append(f"{reg_min}-{reg_max}")
         return brick_strings
+
+    def save_to_disk(self):
+        """Saves this region to disk"""
+        param_dict = {"ra_min": self.ra_min,
+                      "ra_max": self.ra_max,
+                      "dec_min": self.dec_min,
+                      "dec_max": self.dec_max}
+        fpath = get_filepath("region_backup", stem=self.stem)
+        with open(fpath, "w", encoding="utf-8") as f:
+            f.write(json.dumps(param_dict))
