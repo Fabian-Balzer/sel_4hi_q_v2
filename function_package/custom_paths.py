@@ -7,7 +7,7 @@ from .custom_types import Dirpath, Filepath, TableType
 STEM = "base"  # The stem can be changed in case you want to differentiate between
 
 
-def get_lephare_directory(lephare_type: Literal["input", "output", "filters", "parameters",
+def get_lephare_directory(lephare_type: Literal["input", "output", "filters", "filter_origin", "parameters",
                                                 "templates", "main", "work", "dir"]) -> Dirpath:
     """Retrieve the given LePhare directory.
 
@@ -25,6 +25,8 @@ def get_lephare_directory(lephare_type: Literal["input", "output", "filters", "p
     dirpath_dict = {"main": main_path}
     for path_type in ["input", "output", "filters", "parameters", "templates"]:
         dirpath_dict[path_type] = main_path + path_type + "/"
+    dirpath_dict["filter_origin"] = dirpath_dict["filters"] + \
+        "individual_files/"
     if lephare_type == "work":
         assert "LEPHAREWORK" in os.environ, "Please set up the LEPHAREWORK environment variable on your system"
         return os.environ["LEPHAREWORK"] + "/"
@@ -63,7 +65,7 @@ def get_directory(dir_type: Literal["data", "catalogues", "regions",
 
 def get_filepath(path_type: Literal["region_backup", "match_backup", "processed_backup",
                                     "lephare_in", "lephare_out", "para_in", "para_out",
-                                    "filter"],
+                                    "filter", "template"],
                  ttype: Optional[TableType] = None, stem="base") -> Filepath:
     """Get the unified filepath string for a given filepath type.
     Via the stem argument, the filenames can be altered.
@@ -88,12 +90,13 @@ def get_filepath(path_type: Literal["region_backup", "match_backup", "processed_
                      "processed_backup": f"{get_directory('match_backups')}{stem}_processed_{ttype}.fits",
                      "lephare_in": f"{get_lephare_directory('input')}{stem}_input_{ttype}.in",
                      "lephare_out": f"{get_lephare_directory('output')}{stem}_output_{ttype}.out",
-                     "para_in": f"{get_lephare_directory('parameters')}{stem}_input.para",
-                     "para_out": f"{get_lephare_directory('parameters')}{stem}_output.para",
-                     "filter": f"{get_lephare_directory('filters')}{stem}.filt"}
+                     "para_in": f"{get_lephare_directory('parameters')}{stem}_in.para",
+                     "para_out": f"{get_lephare_directory('parameters')}{stem}_out.para",
+                     "filter": f"{get_lephare_directory('filters')}{stem}.filt",
+                     "template": f"{get_lephare_directory('templates')}{stem}_{ttype}.list"}
     assert path_type in filepath_dict, f"The type of file you have specified does not exist, please use one of the following: {', '.join(filepath_dict)}"
     # The path_types that do not make use of ttype:
-    need_ttype = ["processed_backup", "lephare_in", "lephare_out"]
+    need_ttype = ["processed_backup", "lephare_in", "lephare_out", "template"]
     assert path_type not in need_ttype or ttype is not None, "Please specify a table type for this kind of path."
     fpath = filepath_dict[path_type]
 

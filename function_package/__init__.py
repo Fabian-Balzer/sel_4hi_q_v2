@@ -9,4 +9,4 @@ from .matching import (match_shu_with_sweep, match_vhs_to_table,
 from .pre_processing import (process_for_lephare, process_galex_columns,
                              process_sweep_columns, process_vhs_columns,
                              split_table_by_sourcetype)
-from .util import generate_all_filepaths
+from .util import ask_file_overwrite, generate_all_filepaths

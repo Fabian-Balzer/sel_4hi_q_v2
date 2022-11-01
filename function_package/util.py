@@ -1,10 +1,12 @@
 """Utility functions for smoothing things out"""
+import logging
 import os
 
 import numpy as np
 from astropy.table import Table
 
 from .custom_paths import get_directory, get_lephare_directory
+from .custom_types import Filepath
 
 
 def rename_columns_to_lowercase(table: Table) -> Table:
@@ -58,3 +60,34 @@ def generate_all_filepaths():
                      "templates", "main", "work", "dir"]
     for path in lephare_paths:
         os.makedirs(get_lephare_directory(path), exist_ok=True)
+
+
+def ask_file_overwrite(fpath: Filepath) -> bool:
+    """Prompts the user if there already exists a file at the given fpath
+
+    Parameters
+    ----------
+    fpath : Filepath
+        filename and path of the file that is supposed to be written
+
+    Returns
+    -------
+    bool
+        True if the file should be replaced, otherwise False
+    """
+    path, fname = os.path.split(fpath)
+    if not os.path.exists(fpath):
+        logging.info("Writing the file '%s'", fpath)
+        return True
+    answer = input(
+        f"The file '{fname}' already exists at {path}. Continue and replace it (y/n)?\n>>> ")
+
+    for _ in range(5):
+        if answer.lower() in ["y", "yes"]:
+            logging.info("Overwriting '%s'", fpath)
+            return True
+        if answer.lower() in ["n", "no"]:
+            logging.info("Skipped writing '%s'", fpath)
+            return False
+        answer = input(
+            "Please answer with 'y' (overwrite) or 'n' (skip overwrite)?\n>>> ")
