@@ -1,5 +1,8 @@
-data/
-catalogues/
+
+*.in
+*.out
+*.fits
+*.fit
 
 # ---> Emacs
 # -*- mode: gitignore; -*-
