@@ -54,7 +54,7 @@ def get_directory(dir_type: Literal["data", "catalogues", "regions",
         The path of the requested directory, including a trailing backslash
     """
     datapath = os.getcwd() + "/data/"
-    catpath = os.getcwd() + "catalogues/"
+    catpath = os.getcwd() + "/catalogues/"
     dir_dict = {"data": datapath, "catalogues": catpath}
     for path_type in ["regions", "match_backups", "lephare"]:
         dir_dict[path_type] = datapath + path_type + "/"
