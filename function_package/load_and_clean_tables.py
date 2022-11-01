@@ -63,6 +63,8 @@ def load_and_clean_opt_agn_shu(region: Region, fname: Filename = "optical_agn_sh
         The cleaned AGN table
     """
     fpath = dpath + "/" + fname
+    assert os.path.isfile(
+        fpath), f"Please add a file called {fname} in the catalogues directory to proceed."
     table = Table.read(fpath)
     table = _sanitise_table(table, region, "shu_agn")
     relevant_cols = ["ra", "dec", "phot_z", "prob_rf"]
@@ -96,6 +98,8 @@ def load_and_clean_vhs(region: Region, fname: Filename = "vhs_query_efeds.fits",
         The cleaned VHS table
     """
     fpath = dpath + "/" + fname
+    assert os.path.isfile(
+        fpath), f"Please add a file called {fname} in the catalogues directory to proceed."
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UnitsWarning)
         table = Table.read(fpath)
