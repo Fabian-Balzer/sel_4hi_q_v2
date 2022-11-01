@@ -4,7 +4,7 @@ import os
 import numpy as np
 from astropy.table import Table
 
-from .custom_paths import ALL_PATHS
+from .custom_paths import get_directory, get_lephare_directory
 
 
 def rename_columns_to_lowercase(table: Table) -> Table:
@@ -50,5 +50,11 @@ def generate_all_filepaths():
     WARNING: This might create lots of paths relative to your current working
     directory, so make sure you know what you're doing!
     """
-    for path in ALL_PATHS:
-        os.makedirs(path, exist_ok=True)
+    standard_paths = ["data", "catalogues", "regions",
+                      "match_backups", "lephare", "sweep"]
+    for path in standard_paths:
+        os.makedirs(get_directory(path), exist_ok=True)
+    lephare_paths = ["input", "output", "filters", "parameters",
+                     "templates", "main", "work", "dir"]
+    for path in lephare_paths:
+        os.makedirs(get_lephare_directory(path), exist_ok=True)

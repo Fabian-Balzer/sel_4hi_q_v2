@@ -9,7 +9,7 @@ from astropy.units import UnitsWarning
 
 from .custom_classes import Region
 from .custom_constants import ALL_SWEEP_BANDS, ALL_VHS_BANDS
-from .custom_paths import CATPATH
+from .custom_paths import get_directory
 from .custom_types import Dirpath, Filename
 from .util import convert_rad_to_deg, rename_columns_to_lowercase
 
@@ -42,7 +42,7 @@ def _sanitise_table(table: Table, region: Optional[Region] = None, name: str = "
 
 
 def load_and_clean_opt_agn_shu(region: Region, fname: Filename = "optical_agn_shu.fits",
-                               dpath: Dirpath = CATPATH, rf_prob_cut: float = 0.94) -> Table:
+                               dpath: Dirpath = get_directory("catalogues"), rf_prob_cut: float = 0.94) -> Table:
     """Cleans the opt_agn table by selecting only the relevant columns.
 
     Parameters
@@ -75,7 +75,7 @@ def load_and_clean_opt_agn_shu(region: Region, fname: Filename = "optical_agn_sh
 
 
 def load_and_clean_vhs(region: Region, fname: Filename = "vhs_query_efeds.fits",
-                       dpath: Dirpath = CATPATH, bands: Sequence[str] = ALL_VHS_BANDS) -> Table:
+                       dpath: Dirpath = get_directory("catalogues"), bands: Sequence[str] = ALL_VHS_BANDS) -> Table:
     """Cleans the vhs table by selecting only the relevant columns.
 
     Parameters
@@ -112,7 +112,7 @@ def load_and_clean_vhs(region: Region, fname: Filename = "vhs_query_efeds.fits",
     return table
 
 
-def load_and_clean_sweep(region: Region, dpath: Dirpath = CATPATH,
+def load_and_clean_sweep(region: Region, dpath: Dirpath = get_directory("catalogues"),
                          bands: Sequence[str] = ALL_SWEEP_BANDS) -> Table:
     """Cleans the sweep table by selecting only the relevant columns.
 

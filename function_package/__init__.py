@@ -1,6 +1,6 @@
 """Some functions needed for the matching"""
 from .custom_classes import Region
-from .custom_paths import CATPATH, DATAPATH, get_filepath
+from .custom_paths import get_directory, get_filepath, get_lephare_directory
 from .file_io import read_table_from_backup, write_table_as_backup
 from .load_and_clean_tables import (load_and_clean_opt_agn_shu,
                                     load_and_clean_sweep, load_and_clean_vhs)
