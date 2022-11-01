@@ -1,7 +1,7 @@
 """Some custom classes that might be necessary"""
 import json
 from math import ceil, floor
-from typing import Optional
+from typing import List, Optional
 
 from astropy.table import Table
 
@@ -80,11 +80,11 @@ class Region:
 
     def _get_sweep_region_string(self, ra: int, dec: int) -> Regionstring:
         """Returns a string conforming to the naming convention of the SWEEP
-        catalogues following the <AAA>c<BBB> pattern where AAA is the ra, c 
+        catalogues following the <AAA>c<BBB> pattern where AAA is the ra, c
         the p or m for the sign of dec and BBB is the dec."""
         return f"{ra:03}{self._get_sweep_sgn_str(dec)}{abs(dec):03}"
 
-    def get_included_sweep_bricks(self) -> list[Brickstring]:
+    def get_included_sweep_bricks(self) -> List[Brickstring]:
         """Retrieve the relevant SWEEP bricks for this region.
 
         Returns

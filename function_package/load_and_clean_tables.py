@@ -42,7 +42,8 @@ def _sanitise_table(table: Table, region: Optional[Region] = None, name: str = "
 
 
 def load_and_clean_opt_agn_shu(region: Region, fname: Filename = "optical_agn_shu.fits",
-                               dpath: Dirpath = get_directory("catalogues"), rf_prob_cut: float = 0.94) -> Table:
+                               dpath: Dirpath = get_directory("catalogues"),
+                               rf_prob_cut: float = 0.94) -> Table:
     """Cleans the opt_agn table by selecting only the relevant columns.
 
     Parameters
@@ -175,7 +176,7 @@ def clean_galex_matched_table(matched_table: Table) -> Table:
     """
     relevant_cols = ["angDist", "RAJ2000", "DEJ2000", "sweep_id",
                      "E(B-V)", "Fflux", "Nflux", "e_Fflux", "e_Nflux"]
-    new_colnames = ["sep_to_galex", "ra_galex", "dec_galex", "sweep_id"
+    new_colnames = ["sep_to_galex", "ra_galex", "dec_galex", "sweep_id_galex",
                     "galex_ebv", "flux_fuv", "flux_nuv", "flux_err_fuv", "flux_err_nuv"]
     matched_table.keep_columns(relevant_cols)
     matched_table.rename_columns(relevant_cols, new_colnames)

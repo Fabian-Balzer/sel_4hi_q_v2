@@ -1,6 +1,6 @@
 """Functions to perform the processing needed in preparation for LePhare."""
 import logging
-from typing import Sequence
+from typing import Sequence, Tuple
 
 import numpy as np
 from astropy.table import Table
@@ -101,7 +101,7 @@ def _delete_all_apermag_cols(table: TableSplit, ttype: TableType) -> Table:
     return table
 
 
-def split_table_by_sourcetype(table: Table) -> tuple[TablePointlike, TableExtended]:
+def split_table_by_sourcetype(table: Table) -> Tuple[TablePointlike, TableExtended]:
     """Splits the given table into two subsets of point-like and extended sources and
     deletes irrelevant (vhs) columns, as 2''8 (apermag4) photometry is used for pointlike
     and apermag6 is used for extended sources
@@ -172,6 +172,8 @@ def process_for_lephare(table: TableSplit, bands: Sequence[Band] = ALL_BANDS) ->
     """
     col_list = ["sweep_id"]
     new_colnames = ["IDENT"]
+    if "zspec" not in table.colnames:
+        table["zspec"] = -99.
     for band in bands:
         col_list.append("c_flux_" + band)
         col_list.append("c_flux_err_" + band)

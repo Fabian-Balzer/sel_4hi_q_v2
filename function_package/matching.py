@@ -41,12 +41,12 @@ def match_shu_with_sweep(sweep_table: Table, shu_table: Table, match_radius: flo
     indices = indices[sel]
     distances = distances[sel]
     distances = Table([distances], names=["sep_dist_to_sweep"])
-    match = hstack([distances, sweep_table[indices]], shu_table[sel],
+    match = hstack([distances, sweep_table[indices], shu_table[sel]],
                    table_names=["", "sweep", "shu"])
     match.rename_columns(["ra_sweep", "dec_sweep"], ["ra", "dec"])
     num_of_unmatched_sources = len(shu_table) - len(indices)
-    logging.info("Match of agn to sweep successful;\nFor %d of the %d sources in the agn table, no match was found within the given radius.",
-                 num_of_unmatched_sources, len(shu_table))
+    logging.info("Match of agn to sweep successful for %s sources;\nFor %d of the %d sources in the agn table, no match was found within the given radius.",
+                 len(match), num_of_unmatched_sources, len(shu_table))
     logging.info(
         "From now on, the ra and dec columns refer to the sweep ra and dec.")
     return match
@@ -126,10 +126,11 @@ def match_with_galex_and_clean_it(table_base: Table, match_radius: float = 3.5) 
                          max_distance=match_radius * u.arcsec, colRA1='ra',
                          colDec1='dec')
     match = clean_galex_matched_table(match)
+    table_base["sweep_id_galex"] = np.int64(table_base["sweep_id"])
     logging.info(
         "Found %d matching galex sources within the prescribed radius.", len(match))
     # Join the matched sources to the base table via the sweep_id column
     match = join(table_base, match, table_names=[
-                 "sweep", "galex"], join_type="left", keys="sweep_id")
+                 "sweep", "galex"], join_type="left", keys="sweep_id_galex")
 
     return match

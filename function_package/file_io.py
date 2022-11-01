@@ -7,7 +7,7 @@ from astropy.table import Table
 from astropy.units import UnitsWarning
 
 from .custom_paths import get_filepath
-from .custom_types import Filestem, TableSplit, TableType
+from .custom_types import TableType
 
 
 def write_table_as_backup(table: Table, path_type: str, ttype: Optional[TableType] = None,
