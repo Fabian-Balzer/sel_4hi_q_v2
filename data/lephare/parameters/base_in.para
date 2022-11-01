@@ -31,7 +31,7 @@ FILTER_REP   $LEPHARE/data/lephare_files/filters           # Repository in which
 #   FUV NUV newg    r   i   z   Y   j   h   k   W1  W2   W3   W4 
 #   1   2   3       4   5   6   7   8   9   10  11   12   13   14 
 #   1   2   4       8   16  32  64  128 256 512 1024 2048 4096 8192
-FILTER_LIST FUV.pb,NUV.pb,newg.pb,dr10i.pb,r.pb,z.pb,Y.lowres,j.lowres,h.lowres,k.lowres,W1.res,W2.res,W3.res,W4.res
+FILTER_LIST FUV.pb,NUV.pb,newg.pb,r.pb,dr10i.pb,z.pb,Y.lowres,j.lowres,h.lowres,k.lowres,W1.res,W2.res,W3.res,W4.res
 TRANS_TYPE	 1			# TRANSMISSION TYPE, 0 for energy, 1 for photons
                                         # 0[-def]: Energy, 1: Nb of photons
 # Optical filters have 0, WISE have 1!

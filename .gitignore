@@ -3,6 +3,7 @@
 *.out
 *.fits
 *.fit
+*.dat
 
 # ---> Emacs
 # -*- mode: gitignore; -*-
