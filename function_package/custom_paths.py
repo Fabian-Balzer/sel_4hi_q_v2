@@ -7,7 +7,8 @@ from .custom_types import Dirpath, Filepath, TableType
 STEM = "base"  # The stem can be changed in case you want to differentiate between
 
 
-def get_lephare_directory(lephare_type: Literal["input", "output", "filters", "filter_origin", "parameters",
+def get_lephare_directory(lephare_type: Literal["input", "output", "filters",
+                                                "filter_origin", "parameters",
                                                 "templates", "main", "work", "dir"]) -> Dirpath:
     """Retrieve the given LePhare directory.
 
